@@ -9,14 +9,14 @@ search_depth = int(input("Enter AI search depth: "))
 positionCount = None
 
 
-def minmaxRoot(depth, game: chess.Board, isMaximisingPlayer):
+def minimax_root(depth, game: chess.Board, isMaximisingPlayer):
     newGameMoves = game.legal_moves
     bestMove = -9999
     bestMoveFound = None
 
     for newGameMove in newGameMoves:
         game.push(newGameMove)
-        value = minmax(depth - 1, game, -10000, 10000, not isMaximisingPlayer)
+        value = minimax(depth - 1, game, -10000, 10000, not isMaximisingPlayer)
         game.pop()
         if value >= bestMove:
             bestMove = value
@@ -25,12 +25,12 @@ def minmaxRoot(depth, game: chess.Board, isMaximisingPlayer):
     return bestMoveFound
 
 
-def minmax(depth, game: chess.Board, alpha, beta, isMaximisingPlayer):
+def minimax(depth, game: chess.Board, alpha, beta, isMaximisingPlayer):
     global positionCount
     positionCount += 1
 
     if depth == 0:
-        return -evaluateBoard(game)
+        return -evaluate_board(game)
 
     newGameMoves = game.legal_moves
 
@@ -38,7 +38,7 @@ def minmax(depth, game: chess.Board, alpha, beta, isMaximisingPlayer):
         bestMove = -9999
         for newGameMove in newGameMoves:
             game.push(newGameMove)
-            bestMove = max(bestMove, minmax(depth - 1, game, alpha, beta, not isMaximisingPlayer))
+            bestMove = max(bestMove, minimax(depth - 1, game, alpha, beta, not isMaximisingPlayer))
             game.pop()
             alpha = max(alpha, bestMove)
             if beta <= alpha:
@@ -49,7 +49,7 @@ def minmax(depth, game: chess.Board, alpha, beta, isMaximisingPlayer):
         bestMove = 9999
         for newGameMove in newGameMoves:
             game.push(newGameMove)
-            bestMove = min(bestMove, minmax(depth - 1, game, alpha, beta, not isMaximisingPlayer))
+            bestMove = min(bestMove, minimax(depth - 1, game, alpha, beta, not isMaximisingPlayer))
             game.pop()
             beta = min(beta, bestMove)
             if beta <= alpha:
@@ -58,18 +58,18 @@ def minmax(depth, game: chess.Board, alpha, beta, isMaximisingPlayer):
         return bestMove
 
 
-def evaluateBoard(game: chess.Board):
+def evaluate_board(game: chess.Board):
     totalEvaluation = 0
     for i in range(8):
         for j in range(8):
             square = chess.Square(i * 8 + j)
-            totalEvaluation += getPieceValue(game.piece_at(square), i, j)
+            totalEvaluation += get_piece_value(game.piece_at(square), i, j)
 
     return totalEvaluation
 
 
-def reverseList(list: list):
-    tsil = list.copy()
+def reverse_list(List: list):
+    tsil = List.copy()
     tsil.reverse()
     return tsil
 
@@ -85,7 +85,7 @@ pawnEvalWhite = [
     [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 ]
 
-pawnEvalBlack = reverseList(pawnEvalWhite)
+pawnEvalBlack = reverse_list(pawnEvalWhite)
 
 knightEval = [
     [-5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0],
@@ -109,7 +109,7 @@ bishopEvalWhite = [
     [-2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0]
 ]
 
-bishopEvalBlack = reverseList(bishopEvalWhite)
+bishopEvalBlack = reverse_list(bishopEvalWhite)
 
 rookEvalWhite = [
     [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
@@ -122,7 +122,7 @@ rookEvalWhite = [
     [0.0, 0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0]
 ]
 
-rookEvalBlack = reverseList(rookEvalWhite)
+rookEvalBlack = reverse_list(rookEvalWhite)
 
 evalQueen = [
     [-2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0],
@@ -147,14 +147,14 @@ kingEvalWhite = [
     [2.0, 3.0, 1.0, 0.0, 0.0, 1.0, 3.0, 2.0]
 ]
 
-kingEvalBlack = reverseList(kingEvalWhite)
+kingEvalBlack = reverse_list(kingEvalWhite)
 
 
-def getPieceValue(piece: chess.Piece, x, y):
+def get_piece_value(piece: chess.Piece, x, y):
     if piece is None:
         return 0
 
-    def getAbsoluteValue(piece: chess.Piece, isWhite: bool, x, y):
+    def get_absolute_value(piece: chess.Piece, isWhite: bool, x, y):
         piece_symbol = piece.symbol().lower()
         if piece_symbol == 'p':
             return 10 + (pawnEvalWhite[y][x] if isWhite else pawnEvalBlack[y][x])
@@ -177,19 +177,19 @@ def getPieceValue(piece: chess.Piece, x, y):
         else:
             raise Exception("Unknown piece type: ", piece_symbol)
 
-    absoluteValue = getAbsoluteValue(piece, piece.color, x, y)
+    absoluteValue = get_absolute_value(piece, piece.color, x, y)
     return absoluteValue if piece.color else -absoluteValue
 
 
-def makeBestMove():
-    bestMove = getBestMove(game)
+def make_best_move():
+    bestMove = get_best_move(game)
     game.push(bestMove)
 
     if game.is_game_over():
         print("GAME OVER")
 
 
-def getBestMove(game: chess.Board):
+def get_best_move(game: chess.Board):
     if game.is_game_over():
         print("GAME OVER")
         return None
@@ -198,7 +198,7 @@ def getBestMove(game: chess.Board):
     positionCount = 0
 
     # move time can be calculated here
-    bestMove = minmaxRoot(search_depth, game, True)
+    bestMove = minimax_root(search_depth, game, True)
 
     return bestMove
 
@@ -268,7 +268,7 @@ while not game.is_game_over():
                     draw_board()
                     is_selected = False
 
-                    makeBestMove()
+                    make_best_move()
                     draw_board()
 
                 else:
